@@ -106,12 +106,21 @@ def url_for(request, service_type, admin=False, endpoint_type=None):
                                              'publicURL')
     catalog = request.user.service_catalog
     service = get_service_from_catalog(catalog, service_type)
+    # jt
+    region_name = request.session.get('region_name', None)
+    current_region = service['endpoints'][0]
+    if region_name:
+        for e in service['endpoints']:
+          if e['region'] == region_name:
+              current_region = e
     if service:
         try:
             if admin:
-                return service['endpoints'][0]['adminURL']
+                #return service['endpoints'][0]['adminURL']
+                return current_region['adminURL']
             else:
-                return service['endpoints'][0][endpoint_type]
+                #return service['endpoints'][0][endpoint_type]
+                return current_region[endpoint_type]
         except (IndexError, KeyError):
             raise exceptions.ServiceCatalogException(service_type)
     else:

@@ -40,8 +40,10 @@ def glanceclient(request):
     insecure = getattr(settings, 'OPENSTACK_SSL_NO_VERIFY', False)
     LOG.debug('glanceclient connection created using token "%s" and url "%s"'
               % (request.user.token.id, url))
-    return glance_client.Client('1', url, token=request.user.token.id,
-                                insecure=insecure)
+    # jt
+    #return glance_client.Client('1', url, token=request.user.token.id,
+    #                            insecure=insecure)
+    return glance_client.get_client(o.hostname, o.port, auth_token=request.user.token, region=request.session.get('region_name', None), auth_url=request.session.get('region_endpoint', None), auth_strategy='keystone')
 
 
 def image_delete(request, image_id):

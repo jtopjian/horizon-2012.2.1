@@ -198,9 +198,16 @@ def novaclient(request):
     insecure = getattr(settings, 'OPENSTACK_SSL_NO_VERIFY', False)
     LOG.debug('novaclient connection created using token "%s" and url "%s"' %
               (request.user.token.id, url_for(request, 'compute')))
+    # jt
+    #c = nova_client.Client(request.user.username,
+    #                       request.user.token.id,
+    #                       project_id=request.user.tenant_id,
+    #                       auth_url=url_for(request, 'compute'),
+    #                       insecure=insecure)
     c = nova_client.Client(request.user.username,
                            request.user.token.id,
                            project_id=request.user.tenant_id,
+                           region_name=request.session.get('region_name', None),
                            auth_url=url_for(request, 'compute'),
                            insecure=insecure)
     c.client.auth_token = request.user.token.id
@@ -212,9 +219,16 @@ def cinderclient(request):
     insecure = getattr(settings, 'OPENSTACK_SSL_NO_VERIFY', False)
     LOG.debug('cinderclient connection created using token "%s" and url "%s"' %
               (request.user.token.id, url_for(request, 'volume')))
+    # jt
+    #c = cinder_client.Client(request.user.username,
+    #                         request.user.token.id,
+    #                         project_id=request.user.tenant_id,
+    #                         auth_url=url_for(request, 'volume'),
+    #                         insecure=insecure)
     c = cinder_client.Client(request.user.username,
                              request.user.token.id,
                              project_id=request.user.tenant_id,
+                             region_name=request.session.get('region_name', None),
                              auth_url=url_for(request, 'volume'),
                              insecure=insecure)
     c.client.auth_token = request.user.token.id
