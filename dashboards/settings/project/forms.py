@@ -48,6 +48,9 @@ class DownloadOpenRCForm(forms.SelfHandlingForm):
             tenant_id = data['tenant']
             tenant_name = dict(self.fields['tenant'].choices)[tenant_id]
 
+            # jt
+            region_name = request.session['region_name']
+
             keystone_url = api.url_for(request,
                                        'identity',
                                        endpoint_type='publicURL')
@@ -55,13 +58,19 @@ class DownloadOpenRCForm(forms.SelfHandlingForm):
             context = {'user': request.user,
                        'auth_url': keystone_url,
                        'tenant_id': tenant_id,
-                       'tenant_name': tenant_name}
+                       # jt
+                       #'tenant_name': tenant_name}
+                       'tenant_name': tenant_name,
+                       'region_name': region_name}
 
             response = shortcuts.render(request,
                                         'settings/project/openrc.sh.template',
                                         context,
                                         content_type="text/plain")
-            response['Content-Disposition'] = 'attachment; filename=openrc.sh'
+            filename = 'openrc-%s.sh' % (region_name)
+            # jt
+            #response['Content-Disposition'] = 'attachment; filename=openrc.sh'
+            response['Content-Disposition'] = 'attachment; filename=%s' % (filename)
             response['Content-Length'] = str(len(response.content))
             return response
 
