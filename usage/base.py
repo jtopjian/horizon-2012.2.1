@@ -30,7 +30,7 @@ class BaseUsage(object):
         self.request = request
         self.summary = {}
         self.usage_list = []
-        self.quotas = {}
+        self.quota = {}
 
     @property
     def today(self):
@@ -107,7 +107,7 @@ class BaseUsage(object):
 
     def get_quotas(self):
         try:
-            self.quotas = api.nova.tenant_quota_usages(self.request)
+            self.quota = api.nova.tenant_quota_usages(self.request)
         except:
             exceptions.handle(self.request,
                               _("Unable to retrieve quota information."))
