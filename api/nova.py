@@ -444,28 +444,46 @@ def tenant_quota_usages(request):
     flavors = dict([(f.id, f) for f in flavor_list(request)])
     volumes = volume_list(request)
 
-    usages = {'instances': {'flavor_fields': [], 'used': len(instances)},
-              'cores': {'flavor_fields': ['vcpus'], 'used': 0},
-              'gigabytes': {'used': sum([int(v.size) for v in volumes]),
+    # jt
+    nclient = novaclient(request)
+    resp, body = nclient.client.get('/limits')
+    print body['limits']['absolute']
+    x = body['limits']['absolute']
+    gigabytes = x['totalVolumeGigabytesUsed']
+    instances = x['totalInstancesUsed']
+    volumes   = x['totalVolumesUsed']
+    cores     = x['totalCoresUsed']
+    ram       = x['totalRAMUsed']
+
+    usages = {'instances': {'flavor_fields': [], 'used': instances},
+              'cores': {'flavor_fields': ['vcpus'], 'used': cores},
+              'gigabytes': {'used': gigabytes,
                             'flavor_fields': []},
-              'volumes': {'used': len(volumes), 'flavor_fields': []},
-              'ram': {'flavor_fields': ['ram'], 'used': 0},
+              'volumes': {'used': volumes, 'flavor_fields': []},
+              'ram': {'flavor_fields': ['ram'], 'used': ram},
               'floating_ips': {'flavor_fields': [], 'used': len(floating_ips)}}
+    #usages = {'instances': {'flavor_fields': [], 'used': len(instances)},
+    #          'cores': {'flavor_fields': ['vcpus'], 'used': 0},
+    #          'gigabytes': {'used': sum([int(v.size) for v in volumes]),
+    #                        'flavor_fields': []},
+    #          'volumes': {'used': len(volumes), 'flavor_fields': []},
+    #          'ram': {'flavor_fields': ['ram'], 'used': 0},
+    #          'floating_ips': {'flavor_fields': [], 'used': len(floating_ips)}}
 
     for usage in usages:
-        for instance in instances:
-            used_flavor = instance.flavor['id']
-            if used_flavor not in flavors:
-                try:
-                    flavors[used_flavor] = flavor_get(request, used_flavor)
-                except:
-                    flavors[used_flavor] = {}
-                    exceptions.handle(request, ignore=True)
-            for flavor_field in usages[usage]['flavor_fields']:
-                instance_flavor = flavors[used_flavor]
-                usages[usage]['used'] += getattr(instance_flavor,
-                                                 flavor_field,
-                                                 0)
+    #    for instance in instances:
+    #        used_flavor = instance.flavor['id']
+    #        if used_flavor not in flavors:
+    #            try:
+    #                flavors[used_flavor] = flavor_get(request, used_flavor)
+    #            except:
+    #                flavors[used_flavor] = {}
+    #                exceptions.handle(request, ignore=True)
+    #        for flavor_field in usages[usage]['flavor_fields']:
+    #            instance_flavor = flavors[used_flavor]
+    #            usages[usage]['used'] += getattr(instance_flavor,
+    #                                             flavor_field,
+    #                                             0)
 
         usages[usage]['quota'] = getattr(quotas, usage)
 
