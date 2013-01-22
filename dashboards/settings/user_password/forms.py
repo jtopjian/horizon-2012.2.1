@@ -37,21 +37,39 @@ class UserPasswordForm(forms.SelfHandlingForm):
         response = shortcuts.redirect(request.build_absolute_uri())
 
         # variables
-        user_id = request.session['user_id']
-        username = request.session['username']
+        original_password = data['original_password']
+        new_password      = data['new_password']
+        user_id           = request.session['user_id']
+        username          = request.session['username']
 
-        # URLs
-        keystone_url = api.url_for(request, 'identity', endpoint_type='publicURL')
-        password_url = "%s/OS-KSCRUD/users/%s" % (keystone_url, user_id)
-        token_url    = "%s/tokens" % keystone_url
+        proceed = True
+        # Make sure the password is somewhat strong
+        if len(new_password) < 8 or \
+          all(c.isalpha() == True for c in new_password) or \
+          all(c.isdigit() == True for c in new_password) or \
+          all(c.isalnum() == True for c in new_password):
+         proceed = False
+         msg = 'Password not strong enough.'
 
-        payload = {'user': {'original_password': data['original_password'], 'password': data['new_password']}}
-        headers = {'X_Auth_Token': request.user.token.id, 'content-type': 'application/json'}
-        r = requests.patch(password_url, data=json.dumps(payload), headers=headers)
-        if r.status_code == 200:
-          messages.success(request, translation.ugettext("Password changed."))
-          logout(request)
+        # Don't allow the password to be changed for the admin
+        if username == 'admin':
+          proceed = False
+          msg = 'Cannot change password for the admin user.'
+
+        if proceed:
+           # URLs
+          keystone_url = api.url_for(request, 'identity', endpoint_type='publicURL')
+          password_url = "%s/OS-KSCRUD/users/%s" % (keystone_url, user_id)
+          token_url    = "%s/tokens" % keystone_url
+   
+          payload = {'user': {'original_password': data['original_password'], 'password': data['new_password']}}
+          headers = {'X_Auth_Token': request.user.token.id, 'content-type': 'application/json'}
+          r = requests.patch(password_url, data=json.dumps(payload), headers=headers)
+          if r.status_code == 200:
+              messages.success(request, translation.ugettext("Password changed."))
+              logout(request)
+          else:
+              messages.error(request, translation.ugettext("Password change failed."))
         else:
-          messages.error(request, translation.ugettext("Password change failed."))
-
+              messages.error(request, translation.ugettext(msg))
         return response
