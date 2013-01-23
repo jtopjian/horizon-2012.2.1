@@ -447,7 +447,6 @@ def tenant_quota_usages(request):
     # jt
     nclient = novaclient(request)
     resp, body = nclient.client.get('/limits')
-    print body['limits']['absolute']
     x = body['limits']['absolute']
     gigabytes = x['totalVolumeGigabytesUsed']
     instances = x['totalInstancesUsed']

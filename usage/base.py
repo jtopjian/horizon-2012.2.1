@@ -108,6 +108,12 @@ class BaseUsage(object):
     def get_quotas(self):
         try:
             self.quota = api.nova.tenant_quota_usages(self.request)
+
+            # jt
+            project_id = self.request.session['tenant_id']
+            owned_image_count = api.get_image_count(project_id, self.request)
+            image_limit = api.get_image_quota(project_id)
+            self.quota['images'] = {'used': owned_image_count, 'quota': image_limit}
         except:
             exceptions.handle(self.request,
                               _("Unable to retrieve quota information."))
@@ -152,4 +158,5 @@ class TenantUsage(BaseUsage):
                 else:
                     instances.append(server_usage)
         usage.server_usages = instances
+
         return (usage,)

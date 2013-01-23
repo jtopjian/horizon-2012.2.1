@@ -10,4 +10,8 @@
 
     <strong>{% trans "Used" %} <span> {{ usage.quota.ram.used|intcomma }} MB </span>{% trans "of" %}<span> {{ usage.quota.ram.quota|intcomma }} MB </span>{% trans "Available RAM" %} </strong>
     {% horizon_progress_bar usage.quota.ram.used usage.quota.ram.quota %}
+
+    {% comment %} jt {% endcomment %}
+    <strong>{% trans "Used" %} <span> {{ usage.quota.images.used|intcomma }} </span>{% trans "of" %}<span> {{ usage.quota.images.quota|intcomma }} </span> {% trans "Available Images" %} </strong>
+    {% horizon_progress_bar usage.quota.images.used usage.quota.images.quota %}
 </div>

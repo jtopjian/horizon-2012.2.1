@@ -181,7 +181,20 @@ class CreateSnapshot(tables.LinkAction):
     classes = ("ajax-modal", "btn-camera")
 
     def allowed(self, request, instance=None):
-        return instance.status in ACTIVE_STATES and not _is_deleting(instance)
+        #return instance.status in ACTIVE_STATES and not _is_deleting(instance)
+        # jt
+        if instance.status in ACTIVE_STATES and not _is_deleting(instance):
+            # Check the limit to how many images the user can own
+            project_id = request.session['tenant_id']
+            owned_image_count = api.get_image_count(project_id, request)
+            image_limit = api.get_image_quota(project_id)
+
+            if image_limit > owned_image_count:
+                return True
+            else:
+                return False
+        else:
+            return False
 
 
 class ConsoleLink(tables.LinkAction):
