@@ -14,4 +14,7 @@
     {% comment %} jt {% endcomment %}
     <strong>{% trans "Used" %} <span> {{ usage.quota.images.used|intcomma }} </span>{% trans "of" %}<span> {{ usage.quota.images.quota|intcomma }} </span> {% trans "Available Images" %} </strong>
     {% horizon_progress_bar usage.quota.images.used usage.quota.images.quota %}
+
+    <strong>DAIR Use Agreement expires {{ usage.quota.expiration }}</strong>
+    <br><br>
 </div>

@@ -15,3 +15,25 @@ def get_image_count(project_id, request):
     (all_images, more_images) = glance.image_list_detailed(request)
     images = [im for im in all_images if im.owner == project_id]
     return len(images)
+
+def get_expiration_dates():
+    dates = {}
+    with open('/etc/openstack-dashboard/dair-expiration.txt') as f:
+        for line in f:
+            project, expiration_date = line.split(':')
+            dates[project] = expiration_date
+    return dates
+
+def get_expiration_date(project_id):
+    dates = get_expiration_dates()
+    if project_id in dates:
+        return dates[project_id]
+    else:
+        return "Information not available."
+
+def set_expiration_date(project_id, expiration_date):
+    dates = get_expiration_dates()
+    dates[project_id] = expiration_date
+    with open('/etc/openstack-dashboard/dair-expiration.txt', 'w') as f:
+        for k, v in dates.iteritems():
+            f.write("%s:%s\n" % (k,v))
