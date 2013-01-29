@@ -12,7 +12,7 @@
     {% horizon_progress_bar usage.quota.ram.used usage.quota.ram.quota %}
 
     {% comment %} jt {% endcomment %}
-    <strong>{% trans "Used" %} <span> {{ usage.quota.images.used|intcomma }} </span>{% trans "of" %}<span> {{ usage.quota.images.quota|intcomma }} </span> {% trans "Available Images" %} </strong>
+    <strong>{% trans "Used" %} <span> {{ usage.quota.images.used|intcomma }} </span>{% trans "of" %}<span> {{ usage.quota.images.quota|intcomma }} </span> {% trans "Available Images / Snapshots" %} </strong>
     {% horizon_progress_bar usage.quota.images.used usage.quota.images.quota %}
 
     <strong>DAIR Use Agreement expires {{ usage.quota.expiration }}</strong>
