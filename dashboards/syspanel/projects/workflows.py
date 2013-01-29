@@ -375,7 +375,7 @@ class UpdateProject(workflows.Workflow):
             # Update the image quota
             if data['images'] != 5:
                 api.set_image_quota(project_id, data['images'])
-            if data['expiration'] != 'Information not available':
+            if data['expiration'] != 'Information not available.':
                 api.set_expiration_date(project_id, data['expiration'])
 
             return True
