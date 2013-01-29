@@ -20,8 +20,10 @@ def get_expiration_dates():
     dates = {}
     with open('/etc/openstack-dashboard/dair-expiration.txt') as f:
         for line in f:
-            project, expiration_date = line.split(':')
-            dates[project] = expiration_date
+            line = line.strip()
+            if line != "":
+                foo = line.split(':')
+                dates[foo[0]] = foo[1]
     return dates
 
 def get_expiration_date(project_id):
