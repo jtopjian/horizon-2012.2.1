@@ -15,6 +15,9 @@
     <strong>{% trans "Used" %} <span> {{ usage.quota.images.used|intcomma }} </span>{% trans "of" %}<span> {{ usage.quota.images.quota|intcomma }} </span> {% trans "Available Images / Snapshots" %} </strong>
     {% horizon_progress_bar usage.quota.images.used usage.quota.images.quota %}
 
+    <strong>{% trans "Used" %} <span> {{ usage.quota.object_mb.used|intcomma }} MB </span>{% trans "of" %}<span> {{usage.quota.object_mb.quota|intcomma }} MB</span> {% trans "Object Storage" %} </strong>
+    {% horizon_progress_bar usage.quota.object_mb.used usage.quota.object_mb.quota %}
+
     <strong>DAIR Use Agreement expires {{ usage.quota.expiration }}</strong>
     <br><br>
 </div>

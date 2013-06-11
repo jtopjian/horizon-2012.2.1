@@ -115,6 +115,9 @@ class BaseUsage(object):
             image_limit = api.get_image_quota(project_id)
             self.quota['images'] = {'used': owned_image_count, 'quota': image_limit}
             self.quota['expiration'] = api.get_expiration_date(project_id)
+            object_mb_usage = api.get_object_mb_usage(project_id)
+            object_mb_limit = api.get_object_mb_quota(project_id)
+            self.quota['object_mb'] = {'used': object_mb_usage, 'quota': object_mb_limit}
         except:
             exceptions.handle(self.request,
                               _("Unable to retrieve quota information."))

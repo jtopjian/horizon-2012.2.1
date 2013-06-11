@@ -44,6 +44,7 @@ class UpdateProjectQuotaAction(workflows.Action):
     ram = forms.IntegerField(min_value=0, label=_("RAM (MB)"))
     floating_ips = forms.IntegerField(min_value=0, label=_("Floating IPs"))
     # jt
+    object_mb = forms.IntegerField(min_value=0, label=_("Object Storage (MB)"))
     images = forms.IntegerField(min_value=0, label=_("Images"))
     expiration = forms.CharField(max_length=50, label=_("Expiration Date"))
 
@@ -54,6 +55,7 @@ class UpdateProjectQuotaAction(workflows.Action):
             project_id = args[0]['project_id']
             self.fields['images'].initial = api.get_image_quota(project_id)
             self.fields['expiration'].initial = api.get_expiration_date(project_id)
+            self.fields['object_mb'].initial = api.get_object_mb_quota(project_id)
 
     class Meta:
         name = _("Quota")
@@ -75,6 +77,7 @@ class UpdateProjectQuota(workflows.Step):
                    "ram",
                    "floating_ips",
                    # jt
+                   "object_mb",
                    "images",
                    "expiration")
 
@@ -372,11 +375,13 @@ class UpdateProject(workflows.Workflow):
                                     cores=data['cores'])
 
             # jt
-            # Update the image quota
+            # Update the custom quotas
             if data['images'] != 5:
                 api.set_image_quota(project_id, data['images'])
             if data['expiration'] != 'Information not available.':
                 api.set_expiration_date(project_id, data['expiration'])
+            if data['object_mb'] != 5:
+                api.set_object_mb_quota(project_id, data['object_mb'])
 
             return True
         except:

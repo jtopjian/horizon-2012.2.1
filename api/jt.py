@@ -16,6 +16,23 @@ def get_image_count(project_id, request):
     images = [im for im in all_images if im.owner == project_id]
     return len(images)
 
+def get_object_mb_quota(project_id):
+    import subprocess
+    cmd = 'sudo /root/novac/bin/novac quota-object_mb-get %s' % project_id
+    object_mb = subprocess.check_output(cmd, shell=True)
+    return int(object_mb.strip())
+
+def set_object_mb_quota(project_id, quota):
+    import subprocess
+    cmd = 'sudo /root/novac/bin/novac quota-object_mb-set %s %s' % (project_id, quota)
+    subprocess.check_call(cmd, shell=True)
+
+def get_object_mb_usage(project_id):
+    import subprocess
+    cmd = 'sudo /root/novac/bin/novac quota-object_mb-usage %s' % project_id
+    object_mb_usage = subprocess.check_output(cmd, shell=True)
+    return int(object_mb_usage.strip())
+
 def get_expiration_dates():
     dates = {}
     with open('/etc/openstack-dashboard/dair-expiration.txt') as f:
