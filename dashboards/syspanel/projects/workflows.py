@@ -56,6 +56,10 @@ class UpdateProjectQuotaAction(workflows.Action):
             self.fields['images'].initial = api.get_image_quota(project_id)
             self.fields['expiration'].initial = api.get_expiration_date(project_id)
             self.fields['object_mb'].initial = api.get_object_mb_quota(project_id)
+        else:
+            self.fields['images'].initial = 5
+            self.fields['expiration'].initial = 'Information not available.'
+            self.fields['object_mb'].initial = 2048
 
     class Meta:
         name = _("Quota")
@@ -238,6 +242,17 @@ class CreateProject(workflows.Workflow):
                                              role_id=role.id)
                     users_added += 1
                 users_to_add -= users_added
+
+            # jt
+            # Make sure admin is added to the project as a ResellerAdmin
+            users = api.keystone.user_list(request)
+            admin_id = [user.id for user in users if user.name == 'admin'][0]
+            reseller_admin_role_id = [role.id for role in available_roles if role.name == 'ResellerAdmin'][0]
+            api.add_tenant_user_role(request,
+                                     tenant_id=project_id,
+                                     user_id=admin_id,
+                                     role_id=reseller_admin_role_id)
+
         except:
             exceptions.handle(request, _('Failed to add %s project members '
                                          'and set project quotas.'
@@ -257,6 +272,15 @@ class CreateProject(workflows.Workflow):
                                          instances=data['instances'],
                                          injected_files=data['injected_files'],
                                          cores=data['cores'])
+            # jt
+            # Update the custom quotas
+            if data['images'] != 5:
+                api.set_image_quota(project_id, data['images'])
+            if data['expiration'] != 'Information not available.':
+                api.set_expiration_date(project_id, data['expiration'])
+            if data['object_mb'] != 2048:
+                api.set_object_mb_quota(project_id, data['object_mb'])
+
         except:
             exceptions.handle(request, _('Unable to set project quotas.'))
         return True
@@ -380,7 +404,7 @@ class UpdateProject(workflows.Workflow):
                 api.set_image_quota(project_id, data['images'])
             if data['expiration'] != 'Information not available.':
                 api.set_expiration_date(project_id, data['expiration'])
-            if data['object_mb'] != 5:
+            if data['object_mb'] != 2048:
                 api.set_object_mb_quota(project_id, data['object_mb'])
 
             return True
