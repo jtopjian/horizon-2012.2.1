@@ -59,7 +59,7 @@ class UpdateProjectQuotaAction(workflows.Action):
         else:
             self.fields['images'].initial = 5
             self.fields['expiration'].initial = 'Information not available.'
-            self.fields['object_mb'].initial = 2048
+            self.fields['object_mb'].initial = 204800
 
     class Meta:
         name = _("Quota")
@@ -278,7 +278,7 @@ class CreateProject(workflows.Workflow):
                 api.set_image_quota(project_id, data['images'])
             if data['expiration'] != 'Information not available.':
                 api.set_expiration_date(project_id, data['expiration'])
-            if data['object_mb'] != 2048:
+            if data['object_mb'] != 204800:
                 api.set_object_mb_quota(project_id, data['object_mb'])
 
         except:
@@ -404,7 +404,7 @@ class UpdateProject(workflows.Workflow):
                 api.set_image_quota(project_id, data['images'])
             if data['expiration'] != 'Information not available.':
                 api.set_expiration_date(project_id, data['expiration'])
-            if data['object_mb'] != 2048:
+            if data['object_mb'] != 204800:
                 api.set_object_mb_quota(project_id, data['object_mb'])
 
             return True
